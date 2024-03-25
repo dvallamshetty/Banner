@@ -1,0 +1,29 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/spfx-serve.schema.json",
+  "port": 4321,
+  "https": true,
+  "serveConfigurations": {
+    "default": {
+      "pageUrl": "https://chartercom.sharepoint.com/sites/Collaboration/SitePages/CTG-Home.aspx",
+      "customActions": {
+        "65cd144f-0161-4e96-90a9-05926183dcf2": {
+          "location": "ClientSideExtension.ApplicationCustomizer",
+          "properties": {
+            "testMessage": "Test message"
+          }
+        }
+      }
+    },
+    "banner": {
+      "pageUrl": "https://chartercom.sharepoint.com/sites/Collaboration/SitePages/CTG-Home.aspx",
+      "customActions": {
+        "65cd144f-0161-4e96-90a9-05926183dcf2": {
+          "location": "ClientSideExtension.ApplicationCustomizer",
+          "properties": {
+            "testMessage": "Test message"
+          }
+        }
+      }
+    }
+  }
+}
