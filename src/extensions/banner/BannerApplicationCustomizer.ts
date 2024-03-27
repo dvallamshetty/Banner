@@ -8,6 +8,7 @@ import { spfi, SPFx } from "@pnp/sp";
 import "@pnp/sp/webs";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
+import { PermissionKind } from "@pnp/sp/security";
 //import { Web } from "@pnp/sp/webs";
 //import { _Items } from '@pnp/sp/items/types';
 const LOG_SOURCE: string = 'BannerApplicationCustomizer';
@@ -34,19 +35,37 @@ export default class BannerApplicationCustomizer
 
   private _renderPlaceHolders(): void {
     const webUrl = this.context.pageContext.web.absoluteUrl;
+    let displayBanner: boolean = false;
+    let _hasfullPermissions = false;
+    const sp = spfi().using(SPFx(this.context));
     const spWebB = spfi("https://chartercom.sharepoint.com/").using(SPFx(this.context));
+    sp.web.currentUserHasPermissions(PermissionKind.FullMask).then(
+      result => {
+        console.log(result);
+        _hasfullPermissions = result;
+      }
+    ).catch(e => { console.error(e) });
     spWebB.web.lists.getByTitle("BannerDetails").items.top(1).filter("SourceSiteUrl eq '" + webUrl + "'")().then(bannerFound => {
-      if (bannerFound) { this._renderBanner(bannerFound[0].BannerMessage) }
+      const _output: any = bannerFound[0];
+      const _bannermessage: string = _output.BannerMessage;
+
+      if (_output.OnlyFullControlUsers === false) {
+        displayBanner = true;
+      }
+      else {
+        displayBanner = _hasfullPermissions;
+      }      
+      if (bannerFound) { this._renderBanner(_bannermessage, displayBanner) }
     }).catch(e => { console.error(e) });
 
   }
 
-  private _renderBanner(bannerMessage: string):void {
+  private _renderBanner(bannerMessage: string, condition: boolean): void {
 
     console.log(bannerMessage)
     this.properties.bannerMessage = bannerMessage;
     // Handling the banner placeholder
-    if (!this._bannerPlaceholder) {
+    if (!this._bannerPlaceholder && condition) {
       this._bannerPlaceholder = this.context.placeholderProvider.tryCreateContent(PlaceholderName.Top, { onDispose: this._onDispose });
       // The extension should not assume that the expected placeholder is available.
       if (!this._bannerPlaceholder) { console.error("The expected placeholder (Top) was not found."); return; }
@@ -73,6 +92,6 @@ export default class BannerApplicationCustomizer
   }
 
   private _onDispose(): void {
-    console.log('[HelloWorldApplicationCustomizer._onDispose] Disposed custom top and bottom placeholders.');
+    console.log('[BannerApplicationCustomizer._onDispose] Disposed custom top and bottom placeholders.');
   }
 }
