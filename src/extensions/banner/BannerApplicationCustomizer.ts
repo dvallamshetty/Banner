@@ -14,18 +14,10 @@ import { PermissionKind } from "@pnp/sp/security";
 //import { _Items } from '@pnp/sp/items/types';
 const LOG_SOURCE: string = 'BannerApplicationCustomizer';
 
-/**
- * If your command set uses the ClientSideComponentProperties JSON input,
- * it will be deserialized into the BaseExtension.properties object.
- * You can define an interface to describe it.
- */
 export interface IBannerApplicationCustomizerProperties {
-  // This is an example; replace with your own property
   bannerMessage: string;
-  
 }
 
-/** A Custom Action which can be run during execution of a Client Side Application */
 export default class BannerApplicationCustomizer
   extends BaseApplicationCustomizer<IBannerApplicationCustomizerProperties> {
   private _bannerPlaceholder: PlaceholderContent | undefined;  
