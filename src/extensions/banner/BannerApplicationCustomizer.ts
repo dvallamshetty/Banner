@@ -3,6 +3,10 @@ import { BaseApplicationCustomizer, PlaceholderContent, PlaceholderName } from '
 //import { Dialog } from '@microsoft/sp-dialog';
 import styles from './banner.module.scss';
 import { escape } from '@microsoft/sp-lodash-subset';
+import { BaseApplicationCustomizer, PlaceholderContent, PlaceholderName } from '@microsoft/sp-application-base';
+//import { Dialog } from '@microsoft/sp-dialog';
+import styles from './banner.module.scss';
+import { escape } from '@microsoft/sp-lodash-subset';
 import * as strings from 'BannerApplicationCustomizerStrings';
 import { spfi, SPFx } from "@pnp/sp";
 import "@pnp/sp/webs";
@@ -21,14 +25,17 @@ const LOG_SOURCE: string = 'BannerApplicationCustomizer';
 export interface IBannerApplicationCustomizerProperties {
   // This is an example; replace with your own property
   bannerMessage: string;
+  bannerMessage: string;
 }
 
 /** A Custom Action which can be run during execution of a Client Side Application */
 export default class BannerApplicationCustomizer
   extends BaseApplicationCustomizer<IBannerApplicationCustomizerProperties> {
   private _bannerPlaceholder: PlaceholderContent | undefined;
+  private _bannerPlaceholder: PlaceholderContent | undefined;
   public onInit(): Promise<void> {
     Log.info(LOG_SOURCE, `Initialized ${strings.Title}`);
+    this.context.placeholderProvider.changedEvent.add(this, this._renderPlaceHolders);
     this.context.placeholderProvider.changedEvent.add(this, this._renderPlaceHolders);
     return Promise.resolve();
   }
