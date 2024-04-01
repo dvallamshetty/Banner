@@ -20,7 +20,7 @@ export interface IBannerApplicationCustomizerProperties {
 
 export default class BannerApplicationCustomizer
   extends BaseApplicationCustomizer<IBannerApplicationCustomizerProperties> {
-  private _bannerPlaceholder: PlaceholderContent | undefined;  
+  private _bannerPlaceholder: PlaceholderContent | undefined;
   public onInit(): Promise<void> {
     Log.info(LOG_SOURCE, `Initialized ${strings.Title}`);
     this.context.placeholderProvider.changedEvent.add(this, this._renderPlaceHolders);
@@ -34,12 +34,25 @@ export default class BannerApplicationCustomizer
     let _hasfullPermissions = false;
     const sp = spfi().using(SPFx(this.context));
     const spWebB = spfi("https://chartercom.sharepoint.com/").using(SPFx(this.context));
-    sp.web.currentUserHasPermissions(PermissionKind.FullMask).then(
+    sp.web.getCurrentUserEffectivePermissions().then((permissions) => {
+      if (sp.web.hasPermissions(permissions, PermissionKind.ManageWeb)
+        && sp.web.hasPermissions(permissions, PermissionKind.ManagePermissions)
+        && sp.web.hasPermissions(permissions, PermissionKind.CreateGroups)) {
+        console.log("User is site owner");
+        _hasfullPermissions = true;
+      }
+      else {
+        console.log("User is not a site owner");
+      }
+    }).catch(e => { console.error(e) })
+
+
+    /* sp.web.currentUserHasPermissions(PermissionKind.FullMask).then(
       result => {
         console.log(result);
         _hasfullPermissions = result;
       }
-    ).catch(e => { console.error(e) });
+    ).catch(e => { console.error(e) }); */
     spWebB.web.lists.getByTitle("BannerDetails").items.top(1).filter("SourceSiteUrl eq '" + webUrl + "'")().then(bannerFound => {
       const _output: any = bannerFound[0];
       const _bannermessage: string = _output.BannerMessage;
@@ -49,7 +62,7 @@ export default class BannerApplicationCustomizer
       }
       else {
         displayBanner = _hasfullPermissions;
-      }      
+      }
       if (bannerFound) { this._renderBanner(_bannermessage, displayBanner) }
     }).catch(e => { console.error(e) });
 
